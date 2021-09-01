@@ -1,3 +1,5 @@
+//Author:Christian Esperon
+//Description:Helper function used to get number of days/weeks/months between two dates
 
 const differenceInDays = (date1, date2, total_applications) => {
 	try{

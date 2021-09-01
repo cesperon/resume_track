@@ -3,7 +3,8 @@ const models = require('../models');
 const responseHandler = require('../helpers/responseHandler.js');
 const dateDifference = require('../helpers/dateDifference.js');
 const { Sequelize } = require('sequelize');
-const moment = require('moment') 
+const moment = require('moment'); 
+const previousDate = require('../helpers/previousDate');
 //operators and or ...
 const { Op } = require("sequelize");
 const { QueryTypes } = require('sequelize');
@@ -197,39 +198,13 @@ const PopularStack = async(req, res) => {
 const ApplicationStatistics = async(req, res) => {
 	try{
 
-		let last_month = await models.Applications.findAndCountAll({
-			where: {
-				createdAt: {
-					[Op.gte]: moment().subtract(1, 'months').toDate()
-				}
-			}
-		});
+		let last_month_count = await previousDate.LastMonthStats();
+		let last_week_count = await previousDate.LastWeekStats();
+		let last_day_count = await previousDate.LastDayStats();
 
-		let last_month_count = last_month.count;
-
-		let last_week = await models.Applications.findAndCountAll({
-			where: {
-				createdAt: {
-					[Op.gte]: moment().subtract(1, 'weeks').toDate()
-				}
-			}
-		});
-
-		let last_week_count = last_week.count;
-
-		let last_day = await models.Applications.findAndCountAll({
-			where: {
-				createdAt: {
-					[Op.gte]: moment().subtract(1, 'days').toDate()
-				}
-			}
-		});
-
-		let last_day_count = last_day.count;
-
-		console.log('last_day', last_day);
-		console.log('last_week', last_week);
-		console.log('last_month', last_month);
+		console.log('last_day', last_day_count);
+		console.log('last_week', last_week_count);
+		console.log('last_month', last_month_count);
 		//get earliest date from date_applied column + latest date from date_applied column
 		let first_date = await models.Applications.findAll(
 		{
