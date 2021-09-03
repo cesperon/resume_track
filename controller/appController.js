@@ -74,6 +74,7 @@ const PostApplications = async(req, res) => {
 		let newApp = await models.Applications.create({
 			company_name: req.body.company_name,
 			hiring_manager: req.body.hiring_manager,
+			user_id: req.user.id,
 			date_applied: req.body.date_applied,
 			platform: req.body.platform,
 			tech_stack: req.body.tech_stack,

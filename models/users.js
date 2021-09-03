@@ -11,13 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // Users.hasMany(models.Applications, {foreignKey: 'user_id'});
+      Users.hasMany(models.Applications, {foreignKey: 'user_id'});
     }
   };
   Users.init({
     username: DataTypes.STRING,
     password: DataTypes.STRING,
-    type: DataTypes.STRING 
+    type: DataTypes.STRING,
+    email: DataTypes.STRING,
+    first_name: DataTypes.STRING,
+    last_name: DataTypes.STRING,
+    salt: DataTypes.STRING,
+    last_login: DataTypes.DATE,
+    role: DataTypes.ENUM('admin', 'user')
+
   }, {
     sequelize,
     modelName: 'Users',
