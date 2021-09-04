@@ -26,7 +26,42 @@ passport.use(new GoogleStrategy({
         passReqToCallback: true
     },
     function(request, accessToken, refreshToken, profile, done) {
-            return done(null, profile);
+            // return done(null, profile);
+        models.Users.findOne({
+            where: {
+                email: profile.email
+            }
+        }).then(function(user) {
+            if (!user) {
+                var currentDate = new Date();
+                var data = {
+                        username: profile.displayName,
+                        email: profile.email,
+                        first_name: profile.given_name,
+                        last_name: profile.family_name,
+                        last_login: currentDate,
+                        role: 'user'
+                    };
+                models.Users.create(data).then(function(newUser, created) {
+                    if (!newUser) {
+                        return done(null, false);
+                    }
+                    if (newUser) {
+                        console.log("new_user", newUser)
+                        return done(null, newUser);
+                    }
+                });
+            }
+            var userinfo = user.get();  
+            return done(null, userinfo);
+ 
+        }).catch(function(err) {
+            console.log("Error:", err);
+            return done(null, false, {
+                message: 'Something went wrong with your Signin'
+            });
+ 
+        });
     }
 ));
 
@@ -65,7 +100,6 @@ passport.use('local-signup', new LocalStrategy(
                         last_name: req.body.lastname,
                         last_login: currentDate,
                         role: 'user'
-         
                     };
                 models.Users.create(data).then(function(newUser, created) {
                     if (!newUser) {
@@ -83,7 +117,6 @@ passport.use('local-signup', new LocalStrategy(
  
 ));
 
-//LOCAL SIGNIN
 passport.use('local-signin', new LocalStrategy(
  
     {

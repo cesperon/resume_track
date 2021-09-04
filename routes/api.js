@@ -14,11 +14,12 @@ router.get("/success",isLoggedIn.isLoggedIn, authController.loginSuccess);
 // router.get("/signup", passportController.registerUser);
 router.post('/signup', passport.authenticate('local-signup', { successRedirect: '/success', failureRedirect: '/failed'}));
 router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] } ));
-router.get('/google/callback', passport.authenticate('google', {successRedirect: '/sucess', failureRedirect: '/failed'}));
+router.get('/google/callback', passport.authenticate('google', {successRedirect: '/success', failureRedirect: '/failed'}));
 router.get("/signup", authController.registerUser);
 router.get("/sign-in", authController.signIn);
 router.post('/signin', passport.authenticate('local-signin', {successRedirect: '/success',failureRedirect: '/failed'}));
 router.get("/logout", authController.logout); 
+router.get("/application/add", authController.addApp);
 
 //applications
 router.get("/applications", appController.GetApplications);

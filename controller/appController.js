@@ -67,6 +67,34 @@ const SearchByStack = async(req, res) => {
 	
 const PostApplications = async(req, res) => {
 	try{
+		console.log("body", req.body);
+		req.body.tech_stack = req.body.tech_stack.split(',');
+		req.body.links = req.body.links.split(',');
+		console.log("links", req.body.links);
+		if(req.body.equity == '0'){
+			req.body.equity = false;
+		}else if(req.body.equity == '1') {
+			req.body.equity == true;
+		}
+		if(req.body.salary == '0'){
+			req.body.salary = false;
+		}else if(req.body.salary == '1') {
+			req.body.salary == true;
+		}
+		if(req.body.four_0_one == '0'){
+			req.body.four_0_one = false;
+		}else if(req.body.four_0_one == '1') {
+			req.body.four_0_one = true;
+		}
+		if(req.body.remote== '0'){
+			req.body.remote = false;
+		}else if(req.body.remote == '1') {
+			req.body.remote == true;
+		}
+
+		console.log('updated body', req.body)
+
+		// console.log("tech_stack", req.body.tech_stack);
 		let validation = await postApplicationsRequest(req.body);
 		if(validation.error == true){
 			return responseHandler(res,true,validation.message, [], 404);
@@ -83,7 +111,7 @@ const PostApplications = async(req, res) => {
 			experience: req.body.experience,
 			location: req.body.location,
 			state: req.body.state,
-			position_type: req.body.position_type,
+			position: req.body.position,
 			equity: req.body.equity,
 			salary: req.body.salary,
 			four_O_one: req.body.four_O_one,

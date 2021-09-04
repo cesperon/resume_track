@@ -3,7 +3,6 @@ const Joi = require('joi')
 const postApplicationsRequest = async (data) => {
 
 	const Schema = Joi.object({
-
 		company_name: Joi.string(),
 		position: Joi.string(),
 		hiring_manager: Joi.string(),
@@ -18,7 +17,7 @@ const postApplicationsRequest = async (data) => {
 	    position_type: Joi.string(),
 	    equity: Joi.boolean(),
 	    salary: Joi.boolean(),
-	    four_O_one: Joi.boolean(),
+	    four_0_one: Joi.boolean(),
 	    remote: Joi.boolean(),
 	    description: Joi.string(),
 	    links: Joi.array().items(Joi.string())
