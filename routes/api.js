@@ -20,6 +20,7 @@ router.get("/sign-in", authController.signIn);
 router.post('/signin', passport.authenticate('local-signin', {successRedirect: '/success',failureRedirect: '/failed'}));
 router.get("/logout", authController.logout); 
 router.get("/application/add", authController.addApp);
+router.post("/login", authController.login);
 
 //applications
 router.get("/applications", appController.GetApplications);

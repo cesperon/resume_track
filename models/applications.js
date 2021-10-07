@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     salary: DataTypes.BOOLEAN,
     four_O_one: DataTypes.BOOLEAN,
     remote: DataTypes.BOOLEAN,
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     links: DataTypes.ARRAY(DataTypes.STRING)
   }, {
     sequelize,

@@ -3,10 +3,12 @@ const passport =require("passport")
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 var LocalStrategy = require('passport-local').Strategy;
 var bCrypt = require('bcrypt-nodejs');
+const jwt = require("jsonwebtoken");
 
 
 passport.serializeUser(function(user, done) {
     done(null, user);
+    //done(null, user.id)
 });
 passport.deserializeUser(function(user, done) {
     // models.Users.findById(id).then(function(user) {
@@ -16,6 +18,11 @@ passport.deserializeUser(function(user, done) {
     //         done(user.errors, null);
     //     }
     // });
+    // let user = users.find((user) => {
+    //     return user.id === id
+    //   })
+
+    // done(null, user)
     done(null, user);
 });
 
@@ -96,18 +103,22 @@ passport.use('local-signup', new LocalStrategy(
                         username: req.body.username,
                         email: email,
                         password: userPassword,
-                        first_name: req.body.firstname,
-                        last_name: req.body.lastname,
+                        first_name: req.body.first_name,
+                        last_name: req.body.last_name,
                         last_login: currentDate,
                         role: 'user'
                     };
+                    console.log('signup-data', data);
                 models.Users.create(data).then(function(newUser, created) {
                     if (!newUser) {
                         return done(null, false);
                     }
                     if (newUser) {
-                        console.log("new_user", newUser)
-                        return done(null, newUser);
+                        console.log("new_user", newUser.get());
+                        const token = jwt.sign(newUser.get(), 'My_Secret');
+
+                        return done(null, {newUser, token});
+
                     }
          
                 });
@@ -148,7 +159,8 @@ passport.use('local-signin', new LocalStrategy(
                 });
             }
             var userinfo = user.get();
-            return done(null, userinfo);
+            const token = jwt.sign(userinfo, 'My_Secret')
+            return done(null, {userinfo, token});
  
         }).catch(function(err) {
             console.log("Error:", err);

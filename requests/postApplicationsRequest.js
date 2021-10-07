@@ -3,24 +3,24 @@ const Joi = require('joi')
 const postApplicationsRequest = async (data) => {
 
 	const Schema = Joi.object({
-		company_name: Joi.string(),
-		position: Joi.string(),
-		hiring_manager: Joi.string(),
+		company_name: Joi.string().optional().allow('').allow(null),
+		position: Joi.string().optional().allow('').allow(null),
+		hiring_manager: Joi.string().optional().allow(null),
 	    date_applied: Joi.date(),
-	    platform: Joi.string(),
-	    tech_stack: Joi.array().items(Joi.string()),
-	    status: Joi.string(),
-	    compensation: Joi.number().integer(),
-	    experience: Joi.string(),
-	    location: Joi.string(),
-	    state: Joi.string(),
-	    position_type: Joi.string(),
-	    equity: Joi.boolean(),
-	    salary: Joi.boolean(),
-	    four_0_one: Joi.boolean(),
-	    remote: Joi.boolean(),
-	    description: Joi.string(),
-	    links: Joi.array().items(Joi.string())
+	    platform: Joi.string().optional().allow('').allow(null),
+	    tech_stack: Joi.array().items(Joi.string()).optional().allow(null),
+	    status: Joi.string().optional().allow('').allow(null),
+	    compensation: Joi.number().integer().optional().allow('').allow(null),
+	    experience: Joi.string().optional().allow('').allow(null),
+	    location: Joi.string().optional().allow('').allow(null),
+	    state: Joi.string().optional().allow('').allow(null),
+	    position_type: Joi.string().optional().allow('').allow(null),
+	    equity: Joi.boolean().optional().allow(null),
+	    salary: Joi.boolean().optional().allow(null),
+	    four_O_one: Joi.boolean().optional().allow(null),
+	    remote: Joi.boolean().optional().allow(null),
+	    description: Joi.string().optional().allow('').allow(null),
+	    links: Joi.array().items(Joi.string()).optional().allow('').allow(null),
 	});
 	let validate = Schema.validate(data);
 	let error =  false;

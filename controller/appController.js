@@ -10,18 +10,39 @@ const { Op } = require("sequelize");
 const { QueryTypes } = require('sequelize');
 const {postApplicationsRequest} = require('../requests/postApplicationsRequest');
 require('sequelize-values')(Sequelize);
+const jwt = require("jsonwebtoken");
 
 const GetApplications = async(req, res) => {
-	try{
-		let applications = await models.Applications.findAll()
-		.then(apps => {
-			console.log(apps);
-			return Sequelize.getValues(apps);
+	// token authorization with jwt
+	const Authorization= req.headers.authorization;
+	const tokenArray = Authorization.split(" ");	
+	const isValid = jwt.verify(tokenArray[1],'My_Secret');
+
+	if (isValid) {
+
+		try{
+			let applications = await models.Applications.findAll({
+				order: [
+					['createdAt', 'DESC'],
+				],
+			})
+			.then(apps => {
+				console.log(apps);
+				return Sequelize.getValues(apps);
+			});
+			return responseHandler(res, false, '', applications, 200);
+		}
+		catch(e){
+
+			console.log(e);
+		}
+
+	}else{
+		res.status(401);
+		res.json({
+			message: "unauthorized",
 		});
-		return responseHandler(res, false, '', applications, 200);
-	}
-	catch(e){
-		console.log(e);
+
 	}
 }
 
@@ -66,64 +87,75 @@ const SearchByStack = async(req, res) => {
 }
 	
 const PostApplications = async(req, res) => {
-	try{
-		console.log("body", req.body);
-		req.body.tech_stack = req.body.tech_stack.split(',');
-		req.body.links = req.body.links.split(',');
-		console.log("links", req.body.links);
-		if(req.body.equity == '0'){
-			req.body.equity = false;
-		}else if(req.body.equity == '1') {
-			req.body.equity == true;
-		}
-		if(req.body.salary == '0'){
-			req.body.salary = false;
-		}else if(req.body.salary == '1') {
-			req.body.salary == true;
-		}
-		if(req.body.four_0_one == '0'){
-			req.body.four_0_one = false;
-		}else if(req.body.four_0_one == '1') {
-			req.body.four_0_one = true;
-		}
-		if(req.body.remote== '0'){
-			req.body.remote = false;
-		}else if(req.body.remote == '1') {
-			req.body.remote == true;
-		}
+	const Authorization= req.headers.authorization;
+	const tokenArray = Authorization.split(" ");	
+	console.log('tok-array', tokenArray);
+	const isValid = jwt.verify(tokenArray[1],'My_Secret');
+	if(isValid){
+		try{
+			console.log("body", req.body);
+			req.body.tech_stack = req.body.tech_stack.split(',').map(item=>item.trim());
+			req.body.links = req.body.links.split(',');
+			console.log("links", req.body.links);
+			console.log('before-update', req.body);
+			if(req.body.equity == '0'){
+				req.body.equity = false;
+			}else if(req.body.equity == '1') {
+				req.body.equity = true;
+			}
+			if(req.body.salary == '0'){
+				req.body.salary = false;
+			}else if(req.body.salary == '1') {
+				req.body.salary = true;
+			}
+			if(req.body.four_O_one == '0'){
+				req.body.four_O_one = false;
+			}else if(req.body.four_O_one == '1') {
+				req.body.four_O_one = true;
+			}
+			if(req.body.remote== '0'){
+				req.body.remote = false;
+			}else if(req.body.remote == '1') {
+				req.body.remote = true;
+			}
 
-		console.log('updated body', req.body)
-
-		// console.log("tech_stack", req.body.tech_stack);
-		let validation = await postApplicationsRequest(req.body);
-		if(validation.error == true){
-			return responseHandler(res,true,validation.message, [], 404);
+			console.log('updated body', req.body);
+			let validation = await postApplicationsRequest(req.body);
+			console.log("validation", isValid);
+			if(validation.error == true){
+				return responseHandler(res,true,validation.message, [], 404);
+			}
+			let newApp = await models.Applications.create({
+				company_name: req.body.company_name,
+				hiring_manager: req.body.hiring_manager,
+				user_id: isValid.id,
+				date_applied: req.body.date_applied,
+				platform: req.body.platform,
+				tech_stack: req.body.tech_stack,
+				status: req.body.status,
+				compensation: req.body.compensation,
+				experience: req.body.experience,
+				location: req.body.location,
+				state: req.body.state,
+				position: req.body.position,
+				equity: req.body.equity,
+				salary: req.body.salary,
+				four_O_one: req.body.four_O_one,
+				remote: req.body.remote,
+				description: req.body.description,
+				links: req.body.links
+			});
+			return responseHandler(res, false,'', [], responseCodes.SUCCESS);
 		}
-		let newApp = await models.Applications.create({
-			company_name: req.body.company_name,
-			hiring_manager: req.body.hiring_manager,
-			user_id: req.user.id,
-			date_applied: req.body.date_applied,
-			platform: req.body.platform,
-			tech_stack: req.body.tech_stack,
-			status: req.body.status,
-			compensation: req.body.compensation,
-			experience: req.body.experience,
-			location: req.body.location,
-			state: req.body.state,
-			position: req.body.position,
-			equity: req.body.equity,
-			salary: req.body.salary,
-			four_O_one: req.body.four_O_one,
-			remote: req.body.remote,
-			description: req.body.description,
-			links: req.body.links
+		catch(e){
+			console.log(e)
+			return responseHandler(res, false, '', [], 200);
+		}
+	}else{
+		res.status(401);
+		res.json({
+			message: "unauthorized",
 		});
-		return responseHandler(res, false,'', [], responseCodes.SUCCESS);
-	}
-	catch(e){
-		console.log(e)
-		return responseHandler(res, false, '', [], 200);
 	}
 }
 
@@ -191,11 +223,12 @@ const PopularStack = async(req, res) => {
 
 		let tech_stack = await models.Applications.findAll(
 			{
-				attributes: ["tech_stack"]
+				attributes: ["tech_stack"],
 
 			}).then(app=>{
 			return Sequelize.getValues(app);
 		});
+		console.log('techStack', tech_stack);
 		//get languages that most occur in tech_stack arrays use dictionary data structure to count occurences
 		for(i = 0; i < tech_stack.length; i++){
 			if(tech_stack[i].tech_stack != null){
@@ -214,6 +247,10 @@ const PopularStack = async(req, res) => {
 		for(i = 0; i < stack.length; i++){
 			result.push({key: stack[i], value: dict[stack[i]]});
 		}
+
+		result.sort(function(a,b){
+			return b.value - a.value;
+		});
 		// debug print return dictionary
 		// console.log(result);
 		return responseHandler(res, false, '', result, 200);

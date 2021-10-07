@@ -1,9 +1,11 @@
+const responseHandler = require('../helpers/responseHandler.js');
 const models = require('../models');
+var bCrypt = require('bcrypt-nodejs');
+
 
 const loginSuccess = (req, res) => {
 
-	res.send(`Welcome ${req.user.first_name} ${req.user.last_name} <a href = "http://localhost:8000/logout">logout</a> <a href = "http://localhost:8000/application/add">add application</a>`);
-	console.log("user", req.user);
+	return responseHandler(res, false, '', req.user, 200);
 }
 
 const loginFail = (req, res) => {
@@ -158,6 +160,13 @@ const logout = (req, res) => {
 
 }
 
+const login = (req, res) => {
+
+	const username = req.body.email;
+	const password = req.body.password;
+	console.log('username', username);
+}
+
 module.exports = {
 
 	loginSuccess,
@@ -165,7 +174,8 @@ module.exports = {
 	registerUser,
 	signIn,
 	logout,
-	addApp
+	addApp,
+	login
 
 
 }
