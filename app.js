@@ -9,7 +9,8 @@ const bodyParser = require('body-parser');
 var morgan = require('morgan');
 const passport = require('passport');
 const cookieSession = require('cookie-session');
-require('./helpers/passport.js');
+var session = require('express-session');
+require('./config/passport.js');
 require('dotenv').config();
 
 //passport
@@ -17,13 +18,20 @@ app.use(cookieSession({
   name: 'google-auth-session',
   keys: ['key1', 'key2']
 }));
-
+// app.use(cookieSession({
+//     name: 'mysession',
+//     keys: ['vueauthrandomkey'],
+//     maxAge: 24 * 60 * 60 * 1000 // 24 hours
+// }))
+// app.use(session({ secret: 'keyboard cat',resave: true, saveUninitialized:true})); // session secret
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(bodyParser({limit: '50mb'}));
-app.use(morgan('combined'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
+app.use(morgan('combined'));
 
 db.sequelize.sync().then(() => {
 	
@@ -45,7 +53,8 @@ db.sequelize.sync().then(() => {
 					<body style="height: 90%; display: flex; align-items: center; justify-content: center;">
 						<h1 style="text-align: center; font-size: 80px; letter-spacing: 3px; color: #006400; font-family: 'Berkshire Swash', cursive; margin: 0;">Resume-Track</h1>
 						<a href = "http://localhost:8000/google">google sign</a>
-						<a href = "http://localhost:8000/register">sign-up</a>
+						<a href = "http://localhost:8000/signup"> sign-up</a>
+						<a href = "http://localhost:8000/sign-in"> sign-in</a>
 					</body>
 				</html>
 			`);

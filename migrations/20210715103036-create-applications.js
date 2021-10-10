@@ -57,7 +57,7 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       links: {
         type: Sequelize.ARRAY(Sequelize.STRING)
